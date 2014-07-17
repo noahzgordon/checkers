@@ -46,7 +46,6 @@ class Piece
         end
 
       elsif move_sequence.count > 1
-        # to check if the move promoted the piece to a king
         perform_jump(move)
 
         # ensures that jump chains cannot be ended early (unless just promoted)
@@ -71,9 +70,9 @@ class Piece
   end
 
   def perform_slide(target)
-    raise InvalidMoveError, "Can't slide onto piece" unless @board[target].nil?
-    raise InvalidMoveError, "Not valid slide" unless valid_slides.include? target
-    raise InvalidMoveError, "Jump available elsewhere" if jump_available?
+    raise InvalidMoveError unless @board[target].nil?
+    raise InvalidMoveError unless valid_slides.include? target
+    raise InvalidMoveError if jump_available?
 
     board[position] = nil
     board[target] = self
@@ -81,21 +80,20 @@ class Piece
   end
 
   def perform_jump(target)
-    raise InvalidMoveError, "Can't jump onto piece" unless @board[target].nil?
-    raise InvalidMoveError, "Not valid jump" unless valid_jumps.include? target
+    raise InvalidMoveError unless @board[target].nil?
+    raise InvalidMoveError unless valid_jumps.include? target
 
-    # there must be a way to write this better... REFACTOR!
     x_dir = (target[0] - position[0]) / 2
     y_dir = (target[1] - position[1]) / 2
 
     jumped_pos = [position[0] + x_dir, position[1] + y_dir]
     jumped = board[jumped_pos]
-    raise InvalidMoveError, "Invalid jump" if jumped.nil? || jumped.color == color
+    raise InvalidMoveError if jumped.nil? || jumped.color == color
 
     board[position] = nil
     board[target] = self
     self.position = target
-    # jumped piece gets captured
+
     board[jumped_pos] = nil
 
     board.captured_counts[jumped.color] += 1
@@ -147,7 +145,6 @@ class Piece
   end
 
   def valid_jumps
-    # same as valid_slides, but everything is multiplied by 2. Refactor?
     moves = []
     move_diffs.each do |(dx, dy)|
       moves << [@position[0] + (dx * 2), @position[1] + (dy * 2)]

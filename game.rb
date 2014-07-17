@@ -2,12 +2,6 @@
 require_relative 'board'
 require 'yaml'
 
-# features to add:
-# + human/computer player support
-# + draw condition: 50 turns without a crown or capture
-# + draw condition: exact board state repeating 3 times
-# + draw condition: player offers a draw (?)
-
 class InvalidInputError < RuntimeError
 end
 
@@ -45,10 +39,17 @@ class Game
   def play
 
     until won?(:dark) || won?(:light)
+      capture_count = board.captured_counts.values.inject(:+)
       begin
-        puts "\n" * 8
 
-        puts "#{@turn.to_s.capitalize}'s turn!\n\n"
+        puts "\n\n"
+        puts "╔════  ╦   ╦  ╔════  ╔════  ╦   ╦  ╔════  ╔═══╗  ╔════  ║"
+        puts "║      ║   ║  ║      ║      ║ ╔═╝  ║      ║   ║  ║      ║"
+        puts "║      ╠═══╣  ╠═══   ║      ╠═╣    ╠═══   ╠═╦═╝  ╚═══╗  ║"
+        puts "║      ║   ║  ║      ║      ║ ╚═╗  ║      ║ ╚╗       ║  ║"
+        puts "╚════  ╩   ╩  ╚════  ╚════  ╩   ╩  ╚════  ║  ╚╗  ════╝  ♔"
+
+        puts "\n\n#{@turn.to_s.capitalize}'s turn!\n\n"
 
         board.display
 
@@ -60,12 +61,14 @@ class Game
         puts "\n#{e.message}"
         retry
       rescue InvalidInputError
-        puts "Invalid input! Try again."
+        puts "\nInvalid input! Try again."
         retry
       rescue GameSavedError
         puts "\nGame successfully saved!"
         retry
       end
+
+
 
       board.pieces.each { |piece| piece.promote if piece.eligible_for_promotion? }
 
@@ -104,6 +107,8 @@ class Game
       raise InvalidInputError unless ROWS.values.include?(pair[1])
       raise InvalidMoveError, "No piece there!" if board[piece_pos].nil?
     end
+
+    puts "\n\n"
 
     [piece_pos, sequence]
   end
@@ -144,9 +149,10 @@ if __FILE__ == $PROGRAM_NAME
   if choice == 'load'
     print "Type the name of the save file you want to load: "
     filename = gets.chomp
+    puts "Loading . . ."
     YAML.load_file("./saves/#{filename}.yml").play
   elsif choice == 'new'
-    puts "Creating your game!\n"
+    puts "Creating your game . . ."
     Game.new.play
   else
     puts "Invalid command! Please run the program and try again."
