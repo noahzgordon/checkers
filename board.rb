@@ -5,7 +5,7 @@ class Board
 
   attr_reader :grid
 
-  def initialize(fill_board)
+  def initialize(fill_board = false)
     @grid = generate_grid
   end
 
