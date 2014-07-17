@@ -19,7 +19,7 @@ class Piece
 
   def perform_moves(move_sequence)
     if valid_move_seq?(move_sequence)
-      perform_moves!(move_sequence)
+      self.perform_moves!(move_sequence)
     else
       raise InvalidMoveError, "Not a valid sequence of moves!"
     end
@@ -51,7 +51,7 @@ class Piece
     duped_piece = duped_board[position]
 
     begin
-      duped_piece.perform_moves!
+      duped_piece.perform_moves!(move_sequence)
     rescue InvalidMoveError
       return false
     end
