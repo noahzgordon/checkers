@@ -18,8 +18,8 @@ class Piece
   end
 
   def perform_slide(target)
-    raise InvalidMoveError unless @board[target].nil?
-    raise InvalidMoveError unless valid_slides.include? target
+    raise InvalidMoveError, "Can't slide onto piece" unless @board[target].nil?
+    raise InvalidMoveError, "Not valid slide" unless valid_slides.include? target
 
     board[position] = nil
     board[target] = self
@@ -29,6 +29,23 @@ class Piece
   end
 
   def perform_jump(target)
+    raise InvalidMoveError, "Can't jump onto piece" unless @board[target].nil?
+    raise InvalidMoveError, "Not valid jump" unless valid_jumps.include? target
+
+    # there must be a way to write this better... REFACTOR!
+    x_dir = (target[0] - position[0]) / 2
+    y_dir = (target[1] - position[1]) / 2
+
+    jumped_pos = [position[0] + x_dir, position[1] + y_dir]
+    raise InvalidMoveError, "No jumped piece." if board[jumped_pos].nil?
+
+    board[position] = nil
+    board[target] = self
+    self.position = target
+    # jumped piece gets captured
+    board[jumped_pos] = nil
+
+    promote if eligible_for_promotion?
   end
 
   def eligible_for_promotion?
@@ -51,6 +68,16 @@ class Piece
     moves = []
     move_diffs.each do |(dx, dy)|
       moves << [@position[0] + dx, @position[1] + dy]
+    end
+
+    moves
+  end
+
+  def valid_jumps
+    # same as valid_slides, but everything is multiplied by 2. Refactor?
+    moves = []
+    move_diffs.each do |(dx, dy)|
+      moves << [@position[0] + (dx * 2), @position[1] + (dy * 2)]
     end
 
     moves
