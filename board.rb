@@ -5,8 +5,8 @@ class Board
 
   attr_reader :grid
 
-  def initialize(fill_board = false)
-    @grid = generate_grid
+  def initialize(grid = nil)
+    @grid = generate_grid if grid.nil?
   end
 
   def [](pos)
@@ -39,7 +39,7 @@ class Board
       end
     end
 
-    duped_board = Board.new(new_grid)
+    duped_board = Board.new
 
     duped_board.pieces.each do |piece|
       piece.board = duped_board
