@@ -17,6 +17,37 @@ class Piece
     "#{king_status} #{color} piece at #{position}"
   end
 
+  def perform_moves!(move_sequence)
+    # can you put a question mark on a local variable?
+    only_jumps = move_sequence.count != 1
+
+    # too many nested if/else loops. Consider refactoring.
+    begin
+      valid_sequence = true
+      move_sequence.each do |move|
+        if only_jumps
+          perform_jump(move)
+        else
+          if valid_slides.include? move
+            perform_slide(move)
+          elsif valid_jumps.include? move
+            perform_jump(move)
+          else
+            raise InvalidMoveError, "Not a valid move"
+          end
+        end
+      end
+    rescue InvalidMoveError
+      valid_sequence = false
+    end
+
+    valid_sequence
+  end
+
+  def valid_move_seq?(move_sequence)
+
+  end
+
   def perform_slide(target)
     raise InvalidMoveError, "Can't slide onto piece" unless @board[target].nil?
     raise InvalidMoveError, "Not valid slide" unless valid_slides.include? target
