@@ -1,5 +1,12 @@
 require_relative 'board'
 
+# features to add:
+# + mandatory jumps
+# + captured piece count
+# + other lose condition (losing player cannot move)
+# + save/load support
+# + human/computer player support
+
 class InvalidInputError < RuntimeError
 end
 
@@ -27,10 +34,11 @@ class Game
     }
 
   attr_reader :board
+  attr_accessor :turn
 
   def initialize
     @board = Board.new
-    @turn = :light
+    @turn = :dark
   end
 
   def play
@@ -45,7 +53,7 @@ class Game
 
         start, moves = get_input
 
-        board[start].perform_moves(moves)
+        board[start].perform_moves(moves, turn)
 
       rescue InvalidMoveError => e
         puts e.message
@@ -55,14 +63,14 @@ class Game
         retry
       end
 
-      @turn == :light ? @turn = :dark : @turn = :light
+      turn == :light ? self.turn = :dark : self.turn = :light
     end
 
     puts "Game over! #{winner.to_s.capitalize} wins!"
   end
 
   def get_input
-    puts "What piece would you like to move?"
+    puts "\nWhat piece would you like to move?"
     coords = gets.chomp.downcase
     piece_pos = [ROWS[coords[1]], COLS[coords[0]]]
 

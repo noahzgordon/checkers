@@ -17,7 +17,11 @@ class Piece
     "#{king_status} #{color} piece at #{position}"
   end
 
-  def perform_moves(move_sequence)
+  def perform_moves(move_sequence, piece_color)
+    if piece_color != color
+      raise InvalidMoveError, "You can only move your own pieces!"
+    end
+
     if valid_move_seq?(move_sequence)
       self.perform_moves!(move_sequence)
     else
@@ -93,9 +97,9 @@ class Piece
   def eligible_for_promotion?
     return false if is_king?
 
-    kingshead = color == :light ? 0 : 7
+    kings_row = color == :light ? 0 : 7
 
-    position[0] == kingshead
+    position[0] == kings_row
   end
 
   def promote
@@ -142,9 +146,9 @@ class Piece
 
   def render
     if color == :light
-      is_king? ? '▵' : '◎'
+      is_king? ? '♔' : '◎'
     else
-      is_king? ? '▲' : '◉'
+      is_king? ? '♚' : '◉'
     end
   end
 end
