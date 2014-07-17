@@ -1,4 +1,5 @@
 require_relative 'board'
+require 'yaml'
 
 # features to add:
 # + mandatory jumps
@@ -95,5 +96,20 @@ class Game
     :light if board.pieces.all? { |piece| piece.color == :light }
     :dark if board.pieces.all? { |piece| piece.color == :dark }
   end
+end
 
+if __FILE__ == $PROGRAM_NAME
+  print "Would you like to LOAD a game or start a NEW one?:"
+  choice = gets.chomp.downcase
+
+  if choice == 'load'
+    print "Type the name of the save file you want to load:"
+    filename = gets.chomp
+    YAML.load_file("./saves/#{filename}.yml").play
+  elsif choice == 'new'
+    puts "Creating your game!\n"
+    Game.new.play
+  else
+    puts "Invalid command! Please run the program and try again."
+  end
 end
