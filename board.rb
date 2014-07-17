@@ -18,17 +18,26 @@ class Board
   end
 
   def display
+    puts "   A  B  C  D  E  F  G  H"
+
     grid.each_with_index do |row, x|
-      row.each_with_index do |piece, y|
-        if piece.nil?
-          print col_square('   ', x, y)
-        else
-          print col_square(" #{piece.render} ", x, y)
+    print "#{8 - x} "
+    row.each_with_index do |piece, y|
+          if piece.nil?
+            print col_square("   ", x, y)
+          else
+            print col_square(" #{piece.render} ", x, y)
+          end
         end
-      end
+
+        # if x == 0
+        #   print "   #{@captured_lights.count} dark pieces captured."
+        # elsif x == 7
+        #   print "   #{@captured_darks.count} light pieces captured."
+        # end
+
       print "\n"
     end
-
     nil
   end
 
