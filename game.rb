@@ -50,20 +50,20 @@ class Game
   def get_input
     puts "What piece would you like to move?"
     coords = gets.chomp.downcase
-    piece_pos = [ROWS[coords[0]], COLS[coords[1]]]
+    piece_pos = [ROWS[coords[1]], COLS[coords[0]]]
 
     puts "Input a move or sequence of moves (separated by commas)."
     input = gets.chomp.downcase.gsub(' ', '').split(',')
-    sequence = input.map { |pair| [ROWS[pair[0]], COLS[pair[1]]] }
+    sequence = input.map { |pair| [ROWS[pair[1]], COLS[pair[0]]] }
 
-    [start, moves]
+    [piece_pos, sequence]
   end
 
   def won?
     winner == :light || winner == :dark
   end
 
-  def winnner
+  def winner
     :light if board.pieces.all? { |piece| piece.color == :light }
     :dark if board.pieces.all? { |piece| piece.color == :dark }
   end
