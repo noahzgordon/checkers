@@ -20,11 +20,11 @@ class Board
   end
 
   def display
-    puts "   A  B  C  D  E  F  G  H"
+
 
     grid.each_with_index do |row, x|
-    print "#{8 - x} "
-    row.each_with_index do |piece, y|
+      print "#{8 - x} "
+        row.each_with_index do |piece, y|
           if piece.nil?
             print col_square("   ", x, y)
           else
@@ -40,6 +40,8 @@ class Board
 
       print "\n"
     end
+
+    puts "   A  B  C  D  E  F  G  H"
     nil
   end
 

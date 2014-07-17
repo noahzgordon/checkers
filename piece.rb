@@ -30,27 +30,22 @@ class Piece
   end
 
   def perform_moves!(move_sequence)
-    # can you put a question mark on a local variable?
-    only_jumps = move_sequence.count != 1
-
     # too many nested if/else loops. Consider refactoring.
     valid_sequence = true
     move_sequence.each_with_index do |move|
-      if only_jumps
-        perform_jump(move)
-        if move == move_sequence.last && jump_available?(self)
-          raise InvalidMoveError, "You must complete your jump chain."
-        end
-      else
+      if move_sequence.count == 1
         if valid_slides.include? move
           perform_slide(move)
         elsif valid_jumps.include? move
           perform_jump(move)
-          if jump_available?(self)
-            raise InvalidMoveError, "You must complete your jump chain."
-          end
+          raise InvalidMoveError if jump_available?(self)
         else
-          raise InvalidMoveError, "One or more moves is invalid."
+          raise InvalidMoveError
+        end
+      else move_sequence.count > 1
+        perform_jump(move)
+        if move == move_sequence.last && jump_available?(self)
+          raise InvalidMoveError
         end
       end
     end
@@ -143,6 +138,10 @@ class Piece
     end
 
     moves
+
+    moves.reject do |move|
+      move[0] < 0 || move[0] > 7 || move[1] < 0 || move[1] > 7
+    end
   end
 
   def valid_jumps
@@ -152,7 +151,9 @@ class Piece
       moves << [@position[0] + (dx * 2), @position[1] + (dy * 2)]
     end
 
-    moves
+    moves.reject do |move|
+      move[0] < 0 || move[0] > 7 || move[1] < 0 || move[1] > 7
+    end
   end
 
   def move_diffs

@@ -5,7 +5,9 @@ require 'yaml'
 # features to add:
 # + other lose condition (losing player cannot move)
 # + human/computer player support
-# + draw conditions?
+# + draw condition: 50 turns without a crown or capture
+# + draw condition: exact board state repeating 3 times
+# + draw condition: player offers a draw (?)
 
 class InvalidInputError < RuntimeError
 end
@@ -43,11 +45,11 @@ class Game
 
   def play
 
-    until won?
-
-      puts "#{@turn.to_s.capitalize}'s turn!\n"
-
+    until won?(:dark) || won?(:light)
       begin
+        puts "\n" * 11
+
+        puts "#{@turn.to_s.capitalize}'s turn!\n\n"
 
         board.display
 
@@ -56,7 +58,7 @@ class Game
         board[start].perform_moves(moves, turn)
 
       rescue InvalidMoveError => e
-        puts e.message
+        puts "\n#{e.message}"
         retry
       rescue InvalidInputError
         puts "Invalid input! Try again."
@@ -69,7 +71,10 @@ class Game
       turn == :light ? self.turn = :dark : self.turn = :light
     end
 
-    puts "Game over! #{winner.to_s.capitalize} wins!"
+    winner = won?(:light) ? :light : :dark
+
+    puts "Game over! #{winner.to_s.capitalize} wins!\n\n"
+    @board.display
   end
 
   private
@@ -102,13 +107,26 @@ class Game
     [piece_pos, sequence]
   end
 
-  def won?
-    winner == :light || winner == :dark
+  def won?(color)
+    board.pieces.all? { |piece| piece.color == color } || alt_won?(color)
   end
 
-  def winner
-    :light if board.pieces.all? { |piece| piece.color == :light }
-    :dark if board.pieces.all? { |piece| piece.color == :dark }
+  def alt_won?(color)
+    # this method is slightly imperfect. The one scenario it does not check for
+    # is if a player's ONLY available move is a jump chain. This is an extremely
+    # unlikely scenario, thankfully.
+    enemy_pieces = board.pieces.select { |piece| piece.color != color }
+
+    # triple-nested loop... kind of ugly.
+    (0..7).each do |x|
+      (0..7).each do |y|
+        enemy_pieces.each do |piece|
+          return false if piece.valid_move_seq?([[x, y]])
+        end
+      end
+    end
+
+    true
   end
 
   def save
@@ -125,7 +143,6 @@ if __FILE__ == $PROGRAM_NAME
   if choice == 'load'
     print "Type the name of the save file you want to load:"
     filename = gets.chomp
-    puts "\nLoading...\n"
     YAML.load_file("./saves/#{filename}.yml").play
   elsif choice == 'new'
     puts "Creating your game!\n"
