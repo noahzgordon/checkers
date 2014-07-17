@@ -1,5 +1,8 @@
 require_relative 'board'
 
+class InvalidInputError < RuntimeError
+end
+
 class Game
   COLS = {
       "a" => 0,
@@ -33,13 +36,24 @@ class Game
   def play
 
     until won?
+
       puts "#{@turn.to_s.capitalize}'s turn!\n"
 
       board.display
 
-      start, moves = get_input
+      begin
 
-      board[start].perform_moves(moves)
+        start, moves = get_input
+
+        board[start].perform_moves(moves)
+
+      rescue InvalidMoveError => e
+        puts e.message
+        retry
+      rescue InvalidInputError
+        puts "Invalid input! Try again."
+        retry
+      end
 
       @turn == :light ? @turn = :dark : @turn = :light
     end
@@ -55,6 +69,12 @@ class Game
     puts "Input a move or sequence of moves (separated by commas)."
     input = gets.chomp.downcase.gsub(' ', '').split(',')
     sequence = input.map { |pair| [ROWS[pair[1]], COLS[pair[0]]] }
+
+    (sequence + [piece_pos]).each do |pair|
+      raise InvalidInputError unless pair.count == 2
+      raise InvalidInputError unless COLS.values.include?(pair[0])
+      raise InvalidInputError unless ROWS.values.include?(pair[1])
+    end
 
     [piece_pos, sequence]
   end
