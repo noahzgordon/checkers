@@ -44,7 +44,7 @@ class Piece
         elsif valid_jumps.include? move
           perform_jump(move)
         else
-          raise InvalidMoveError, "Not a valid slide or jump!"
+          raise InvalidMoveError
         end
       end
     end
@@ -66,6 +66,7 @@ class Piece
   def perform_slide(target)
     raise InvalidMoveError, "Can't slide onto piece" unless @board[target].nil?
     raise InvalidMoveError, "Not valid slide" unless valid_slides.include? target
+    raise InvalidMoveError, "Jump available elsewhere" if jump_available?
 
     board[position] = nil
     board[target] = self
@@ -83,7 +84,9 @@ class Piece
     y_dir = (target[1] - position[1]) / 2
 
     jumped_pos = [position[0] + x_dir, position[1] + y_dir]
-    raise InvalidMoveError, "No jumped piece." if board[jumped_pos].nil?
+    if board[jumped_pos].nil? || board[jumped_pos].color == color
+      raise InvalidMoveError, "Invalid jump"
+    end
 
     board[position] = nil
     board[target] = self
@@ -92,6 +95,22 @@ class Piece
     board[jumped_pos] = nil
 
     promote if eligible_for_promotion?
+  end
+
+  def jump_available?(piece = nil)
+    # you would pass this message a single piece when checking mid-sequence if
+    # it has to keep making jumps.
+    if piece.nil?
+      pieces = board.pieces.select { |piece| piece.color == color }
+    else
+      pieces = [piece]
+    end
+
+    pieces.any? do |piece|
+      piece.valid_jumps.any? do |jump|
+        piece.valid_move_seq?([jump])
+      end
+    end
   end
 
   def eligible_for_promotion?
@@ -151,4 +170,6 @@ class Piece
       is_king? ? '♚' : '◉'
     end
   end
+
+
 end

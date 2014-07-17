@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require_relative 'board'
 require 'yaml'
 
@@ -7,6 +8,7 @@ require 'yaml'
 # + other lose condition (losing player cannot move)
 # + save/load support
 # + human/computer player support
+# + draw conditions?
 
 class InvalidInputError < RuntimeError
 end
@@ -48,9 +50,9 @@ class Game
 
       puts "#{@turn.to_s.capitalize}'s turn!\n"
 
-      board.display
-
       begin
+
+        board.display
 
         start, moves = get_input
 
@@ -83,6 +85,7 @@ class Game
       raise InvalidInputError unless pair.count == 2
       raise InvalidInputError unless COLS.values.include?(pair[0])
       raise InvalidInputError unless ROWS.values.include?(pair[1])
+      raise InvalidMoveError, "No piece there!" if board[piece_pos].nil?
     end
 
     [piece_pos, sequence]
