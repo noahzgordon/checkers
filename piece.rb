@@ -90,15 +90,16 @@ class Piece
     y_dir = (target[1] - position[1]) / 2
 
     jumped_pos = [position[0] + x_dir, position[1] + y_dir]
-    if board[jumped_pos].nil? || board[jumped_pos].color == color
-      raise InvalidMoveError, "Invalid jump"
-    end
+    jumped = board[jumped_pos]
+    raise InvalidMoveError, "Invalid jump" if jumped.nil? || jumped.color == color
 
     board[position] = nil
     board[target] = self
     self.position = target
     # jumped piece gets captured
     board[jumped_pos] = nil
+
+    board.captured_counts[jumped.color] += 1
 
     promote if eligible_for_promotion?
   end

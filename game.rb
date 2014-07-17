@@ -3,8 +3,6 @@ require_relative 'board'
 require 'yaml'
 
 # features to add:
-# + forced jump chain
-# + captured piece count
 # + other lose condition (losing player cannot move)
 # + human/computer player support
 # + draw conditions?

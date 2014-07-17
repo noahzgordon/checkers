@@ -4,9 +4,11 @@ require 'colorize'
 class Board
 
   attr_reader :grid
+  attr_accessor :captured_counts
 
   def initialize(grid = nil)
     @grid = grid.nil? ? generate_grid : grid
+    @captured_counts = { :light => 0, :dark => 0 }
   end
 
   def [](pos)
@@ -30,11 +32,11 @@ class Board
           end
         end
 
-        # if x == 0
-        #   print "   #{@captured_lights.count} dark pieces captured."
-        # elsif x == 7
-        #   print "   #{@captured_darks.count} light pieces captured."
-        # end
+        if x == 0 && captured_counts[:dark] > 0
+          print "   #{captured_counts[:dark]} dark piece(s) captured."
+        elsif x == 7 && captured_counts[:light] > 0
+          print "   #{captured_counts[:light]} light piece(s) captured."
+        end
 
       print "\n"
     end
