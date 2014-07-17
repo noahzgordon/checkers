@@ -10,6 +10,11 @@ class Piece
     @king = false
   end
 
+  def inspect
+    king_status = is_king? ? "King" : "Non-king"
+    "#{king_status} #{color} piece at #{position}"
+  end
+
   def perform_slide(target)
     raise InvalidMoveError unless @board[target].nil?
     raise InvalidMoveError unless valid_slides.include? target
@@ -27,7 +32,9 @@ class Piece
   def eligible_for_promotion?
     return false if is_king
 
-    if color == :light ? position[0] == 0 : position[0] == 7
+    kingshead = color == :light ? 0 : 7
+
+    position[0] == kingshead
   end
 
   def promote

@@ -16,6 +16,17 @@ class Board
     grid[pos[0]][pos[1]] = object
   end
 
+  def display
+    grid.each_with_index do |row, x|
+      row.each_with_index do |piece, y|
+        print piece.nil? ? '   ' : " #{piece.render} "
+      end
+      print "\n"
+    end
+  end
+
+  private
+
   def generate_grid
     piece_rows = [0, 1, 2, 5, 6, 7]
 
@@ -32,5 +43,4 @@ class Board
 
     new_grid
   end
-
 end
