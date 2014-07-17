@@ -52,7 +52,7 @@ class Board
   end
 
   def col_square(str, x, y)
-    color = x.even? == y.odd? ? :light_magenta : :light_white
+    color = x.even? == y.odd? ? :cyan : :light_cyan
     str.colorize(:background => color)
   end
 end
