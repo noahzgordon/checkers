@@ -22,29 +22,29 @@ class Piece
     only_jumps = move_sequence.count != 1
 
     # too many nested if/else loops. Consider refactoring.
-    begin
-      valid_sequence = true
-      move_sequence.each do |move|
-        if only_jumps
+    valid_sequence = true
+    move_sequence.each do |move|
+      if only_jumps
+        perform_jump(move)
+      else
+        if valid_slides.include? move
+          perform_slide(move)
+        elsif valid_jumps.include? move
           perform_jump(move)
         else
-          if valid_slides.include? move
-            perform_slide(move)
-          elsif valid_jumps.include? move
-            perform_jump(move)
-          else
-            raise InvalidMoveError, "Not a valid move"
-          end
+          raise InvalidMoveError, "Not a valid slide or jump!"
         end
       end
-    rescue InvalidMoveError
-      valid_sequence = false
     end
-
-    valid_sequence
   end
 
   def valid_move_seq?(move_sequence)
+    duped_board = board.dup
+    duped_piece = duped_board[position]
+
+    begin
+      duped_pieceperform_moves!
+
 
   end
 

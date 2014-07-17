@@ -5,7 +5,7 @@ class Board
 
   attr_reader :grid
 
-  def initialize
+  def initialize(fill_board)
     @grid = generate_grid
   end
 
@@ -39,7 +39,17 @@ class Board
       end
     end
 
-    Board.new(new_grid)
+    duped_board = Board.new(new_grid)
+
+    duped_board.pieces.each do |piece|
+      piece.board = duped_board
+    end
+
+    duped_board
+  end
+
+  def pieces
+    self.grid.flatten.compact
   end
 
   private
