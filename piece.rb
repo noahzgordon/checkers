@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 class InvalidMoveError < RuntimeError
 end
 
@@ -25,15 +26,16 @@ class Piece
     if valid_move_seq?(move_sequence)
       self.perform_moves!(move_sequence)
     else
-      raise InvalidMoveError, "Not a valid sequence of moves!"
+      raise InvalidMoveError, "Not a valid move!"
     end
   end
 
   def perform_moves!(move_sequence)
     # too many nested if/else loops. Consider refactoring.
-    valid_sequence = true
     move_sequence.each_with_index do |move|
+
       if move_sequence.count == 1
+
         if valid_slides.include? move
           perform_slide(move)
         elsif valid_jumps.include? move
@@ -42,8 +44,12 @@ class Piece
         else
           raise InvalidMoveError
         end
-      else move_sequence.count > 1
+
+      elsif move_sequence.count > 1
+        # to check if the move promoted the piece to a king
         perform_jump(move)
+
+        # ensures that jump chains cannot be ended early (unless just promoted)
         if move == move_sequence.last && jump_available?(self)
           raise InvalidMoveError
         end
@@ -72,8 +78,6 @@ class Piece
     board[position] = nil
     board[target] = self
     self.position = target
-
-    promote if eligible_for_promotion?
   end
 
   def perform_jump(target)
@@ -95,8 +99,6 @@ class Piece
     board[jumped_pos] = nil
 
     board.captured_counts[jumped.color] += 1
-
-    promote if eligible_for_promotion?
   end
 
   def jump_available?(piece = nil)

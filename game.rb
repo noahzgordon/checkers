@@ -3,7 +3,6 @@ require_relative 'board'
 require 'yaml'
 
 # features to add:
-# + other lose condition (losing player cannot move)
 # + human/computer player support
 # + draw condition: 50 turns without a crown or capture
 # + draw condition: exact board state repeating 3 times
@@ -47,7 +46,7 @@ class Game
 
     until won?(:dark) || won?(:light)
       begin
-        puts "\n" * 11
+        puts "\n" * 8
 
         puts "#{@turn.to_s.capitalize}'s turn!\n\n"
 
@@ -67,6 +66,8 @@ class Game
         puts "\nGame successfully saved!"
         retry
       end
+
+      board.pieces.each { |piece| piece.promote if piece.eligible_for_promotion? }
 
       turn == :light ? self.turn = :dark : self.turn = :light
     end
@@ -137,11 +138,11 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  print "Would you like to LOAD a game or start a NEW one?:"
+  print "Would you like to LOAD a game or start a NEW one?: "
   choice = gets.chomp.downcase
 
   if choice == 'load'
-    print "Type the name of the save file you want to load:"
+    print "Type the name of the save file you want to load: "
     filename = gets.chomp
     YAML.load_file("./saves/#{filename}.yml").play
   elsif choice == 'new'
