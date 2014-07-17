@@ -44,7 +44,7 @@ class Game
       @turn == :light ? @turn = :dark : @turn = :light
     end
 
-    puts "Game over!"
+    puts "Game over! #{winner.to_s.capitalize} wins!"
   end
 
   def get_input
@@ -60,7 +60,12 @@ class Game
   end
 
   def won?
-    board.pieces.all? { |piece| piece.color == :light || piece.color == :dark }
+    winner == :light || winner == :dark
+  end
+
+  def winnner
+    :light if board.pieces.all? { |piece| piece.color == :light }
+    :dark if board.pieces.all? { |piece| piece.color == :dark }
   end
 
 end
