@@ -22,13 +22,12 @@ class Piece
   end
 
   def perform_jump(target)
-
   end
 
   def eligible_for_promotion?
     return false if is_king
 
-    color == :light ? position[0] == 0 : position[0] == 7
+    if color == :light ? position[0] == 0 : position[0] == 7
   end
 
   def promote
@@ -40,7 +39,7 @@ class Piece
   end
 
   def valid_slides
-    move_diffs.each_with_object do |(dx, dy), []|
+    move_diffs.each_with_object([]) do |(dx, dy), moves|
       [] << [@position[0] + dx, @position[1] + dy]
     end
   end
