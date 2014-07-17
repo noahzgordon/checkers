@@ -17,6 +17,14 @@ class Piece
     "#{king_status} #{color} piece at #{position}"
   end
 
+  def perform_moves(move_sequence)
+    if valid_move_seq?(move_sequence)
+      perform_moves!(move_sequence)
+    else
+      raise InvalidMoveError, "Not a valid sequence of moves!"
+    end
+  end
+
   def perform_moves!(move_sequence)
     # can you put a question mark on a local variable?
     only_jumps = move_sequence.count != 1
@@ -43,9 +51,12 @@ class Piece
     duped_piece = duped_board[position]
 
     begin
-      duped_pieceperform_moves!
+      duped_piece.perform_moves!
+    rescue InvalidMoveError
+      return false
+    end
 
-
+    true
   end
 
   def perform_slide(target)
