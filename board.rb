@@ -1,4 +1,5 @@
 require_relative 'piece'
+require 'colorize'
 
 class Board
 
@@ -19,10 +20,16 @@ class Board
   def display
     grid.each_with_index do |row, x|
       row.each_with_index do |piece, y|
-        print piece.nil? ? '   ' : " #{piece.render} "
+        if piece.nil?
+          print col_square('   ', x, y)
+        else
+          print col_square(" #{piece.render} ", x, y)
+        end
       end
       print "\n"
     end
+
+    nil
   end
 
   private
@@ -42,5 +49,10 @@ class Board
     end
 
     new_grid
+  end
+
+  def col_square(str, x, y)
+    color = x.even? == y.odd? ? :light_magenta : :light_white
+    str.colorize(:background => color)
   end
 end

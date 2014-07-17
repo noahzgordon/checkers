@@ -1,4 +1,6 @@
 # encoding: utf-8
+class InvalidMoveError < RuntimeError
+end
 
 class Piece
 
@@ -30,7 +32,7 @@ class Piece
   end
 
   def eligible_for_promotion?
-    return false if is_king
+    return false if is_king?
 
     kingshead = color == :light ? 0 : 7
 
@@ -46,14 +48,19 @@ class Piece
   end
 
   def valid_slides
-    move_diffs.each_with_object([]) do |(dx, dy), moves|
-      [] << [@position[0] + dx, @position[1] + dy]
+    moves = []
+    move_diffs.each do |(dx, dy)|
+      moves << [@position[0] + dx, @position[1] + dy]
     end
+
+    moves
   end
 
   def move_diffs
     diffs = [[forward_dir, -1], [forward_dir, 1]]
     diffs += [[backward_dir, -1], [backward_dir, 1]] if is_king?
+
+    diffs
   end
 
   def forward_dir
