@@ -3,14 +3,16 @@ require_relative 'board'
 require 'yaml'
 
 # features to add:
-# + mandatory jumps
+# + forced jump chain
 # + captured piece count
 # + other lose condition (losing player cannot move)
-# + save/load support
 # + human/computer player support
 # + draw conditions?
 
 class InvalidInputError < RuntimeError
+end
+
+class GameSavedError < StandardError
 end
 
 class Game
@@ -35,9 +37,6 @@ class Game
       "7" => 1,
       "8" => 0
     }
-
-  attr_reader :board
-  attr_accessor :turn
 
   def initialize
     @board = Board.new
@@ -64,6 +63,9 @@ class Game
       rescue InvalidInputError
         puts "Invalid input! Try again."
         retry
+      rescue GameSavedError
+        puts "\nGame successfully saved!"
+        retry
       end
 
       turn == :light ? self.turn = :dark : self.turn = :light
@@ -72,10 +74,21 @@ class Game
     puts "Game over! #{winner.to_s.capitalize} wins!"
   end
 
+  private
+
+  attr_reader :board
+  attr_accessor :turn
+
   def get_input
-    puts "\nWhat piece would you like to move?"
-    coords = gets.chomp.downcase
-    piece_pos = [ROWS[coords[1]], COLS[coords[0]]]
+    puts "\nInput a piece's coordinate, or type SAVE if you want to save your game."
+    input = gets.chomp.downcase
+
+    if input == 'save'
+      save
+      raise GameSavedError
+    end
+
+    piece_pos = [ROWS[input[1]], COLS[input[0]]]
 
     puts "Input a move or sequence of moves (separated by commas)."
     input = gets.chomp.downcase.gsub(' ', '').split(',')
@@ -99,6 +112,12 @@ class Game
     :light if board.pieces.all? { |piece| piece.color == :light }
     :dark if board.pieces.all? { |piece| piece.color == :dark }
   end
+
+  def save
+    puts "What do you want to name your save file?"
+    filename = gets.chomp
+    File.write("./saves/#{filename}.yml", YAML.dump(self))
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -108,6 +127,7 @@ if __FILE__ == $PROGRAM_NAME
   if choice == 'load'
     print "Type the name of the save file you want to load:"
     filename = gets.chomp
+    puts "\nLoading...\n"
     YAML.load_file("./saves/#{filename}.yml").play
   elsif choice == 'new'
     puts "Creating your game!\n"
