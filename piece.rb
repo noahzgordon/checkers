@@ -35,16 +35,22 @@ class Piece
 
     # too many nested if/else loops. Consider refactoring.
     valid_sequence = true
-    move_sequence.each do |move|
+    move_sequence.each_with_index do |move|
       if only_jumps
         perform_jump(move)
+        if move == move_sequence.last && jump_available?(self)
+          raise InvalidMoveError, "You must complete your jump chain."
+        end
       else
         if valid_slides.include? move
           perform_slide(move)
         elsif valid_jumps.include? move
           perform_jump(move)
+          if jump_available?(self)
+            raise InvalidMoveError, "You must complete your jump chain."
+          end
         else
-          raise InvalidMoveError
+          raise InvalidMoveError, "One or more moves is invalid."
         end
       end
     end
