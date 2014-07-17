@@ -17,6 +17,8 @@ class Piece
     board[position] = nil
     board[target] = self
     self.position = target
+
+    promote if eligible_for_promotion?
   end
 
   def perform_jump(target)
@@ -24,11 +26,13 @@ class Piece
   end
 
   def eligible_for_promotion?
-    # not a king, in the right row for the right color
+    return false if is_king
+
+    color == :light ? position[0] == 0 : position[0] == 7
   end
 
   def promote
-
+    @king = true
   end
 
   def is_king?
@@ -47,11 +51,18 @@ class Piece
   end
 
   def forward_dir
-    @color == :light ? -1 : 1
+    color == :light ? -1 : 1
   end
 
   def backward_dir
-    @color == :light ? 1 : -1
+    color == :light ? 1 : -1
   end
 
+  def render
+    if color == :light
+      is_king? ? '▵' : '◎'
+    else
+      is_king? ? '▲' : '◉'
+    end
+  end
 end
